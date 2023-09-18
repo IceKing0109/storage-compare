@@ -1,0 +1,516 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <!-- isotope -->
+    <script src="./isotope.js"></script>
+    <!-- data range slider -->
+    <link rel="stylesheet" href="./range-slider.css" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+        }
+
+        /* ---- button ---- */
+
+        .button {
+            display: inline-block;
+            padding: 0.5em 1.0em;
+            margin-bottom: 10px;
+            background: #EEE;
+            border: none;
+            border-radius: 7px;
+            background-image: linear-gradient(to bottom, hsla(0, 0%, 0%, 0), hsla(0, 0%, 0%, 0.2));
+            color: #222;
+            font-family: sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #8CF;
+            color: #222;
+        }
+
+        .button:active,
+        .button.is-checked {
+            background-color: #28F;
+        }
+
+        .button.is-checked {
+            color: white;
+        }
+
+        .button:active {
+            box-shadow: inset 0 1px 10px hsla(0, 0%, 0%, 0.8);
+        }
+
+        /* ---- button-group ---- */
+
+        .button-group:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        .button-group .button {
+            float: left;
+            border-radius: 0;
+            margin-left: 0;
+            margin-right: 1px;
+        }
+
+        .button-group .button:first-child {
+            border-radius: 0.5em 0 0 0.5em;
+        }
+
+        .button-group .button:last-child {
+            border-radius: 0 0.5em 0.5em 0;
+        }
+
+        /* ---- grid ---- */
+
+        .grid {
+            /* border: 1px solid #333; */
+            max-width: 1200px;
+        }
+
+        /* clear fix */
+        .grid:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        /* ---- .element-item ---- */
+
+        .element-item {
+            position: relative;
+            float: left;
+            width: calc(25% - 10px);
+            border-radius: 10px;
+            border: 2px solid rgb(36, 131, 8);
+            margin: 5px;
+            padding: 10px;
+            background: #eeecec;
+            color: #262524;
+            display: flex;
+
+        }
+
+        .element-item>* {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row m-0">
+        <div class="col-md-4 p-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    Filters
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item mb-2">
+                        Filter By:
+                        <div class="button-group sort-by-button-group d-flex align-items-center justify-content-center">
+                            <button class="button is-checked" data-sort-value="latency">Latency</button>
+                            <button class="button" data-sort-value="speed">Speed</button>
+                            <button class="button" data-sort-value="cost">Cost</button>
+                        </div>
+                    </li>
+                    <li class="list-group list-group-flush">
+                        <button class="invisible" id="slide-hidden-control" data-sort-value="weight"></button>
+                        <div class="px-4">
+                            <div class="d-flex flex-row align-items-center justify-content-between">
+                                <span>Latency</span>
+                                <span id="range-latency">0</span>
+                            </div>
+                            <Input class="range" id="range-latency-control" name="range-latency-control" type="range"
+                                value="0" min="0" step="0.01" max="1" onChange="rangeLatencySlide(this.value)"></Input>
+                        </div>
+                        <div class="px-4">
+                            <div class="d-flex flex-row align-items-center justify-content-between">
+                                <span>Speed</span>
+                                <span id="range-speed">0</span>
+                            </div>
+                            <Input class="range" id="range-speed-control" name="range-speed-control" type="range"
+                                value="0" min="0" step="0.01" max="1" onChange="rangeSpeedSlide(this.value)"></Input>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <div class="d-flex flex-row align-items-center justify-content-between">
+                                <span>Cost</span>
+                                <span id="range-cost">0</span>
+                            </div>
+                            <Input class="range" id="range-cost-control" name="range-cost-control" type="range"
+                                value="0" min="0" step="0.01" max="1" onChange="rangeCostSlide(this.value)"></Input>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-8 py-3">
+            <hr />
+            <div class="grid">
+             
+            </div>
+        </div>
+
+</body>
+
+<script>
+    let data = [
+        { id: 1, name: "Filecoin_SP1", location: 'Seattle, USA', latency: 1000, speed: 3, cost: 1, weight: 1 },
+        { id: 2, name: "Filecoin_SP2", location: 'Shanghai China', latency: 1200, speed: 2, cost: 1, weight: 1 },
+        { id: 3, name: "Sia_SP1", location: 'Frankfurt, Germany', latency: 400, speed: 6, cost: 2, weight: 1 },
+        { id: 4, name: "Sia_SP2", location: 'San Francisco, USA', latency: 450, speed: 8, cost: 3, weight: 1 },
+        { id: 5, name: "Arweave", location: 'Global', latency: 350, speed: 7, cost: 1, weight: 10 },
+        { id: 6, name: "Filecoin_SP3", location: 'New York, USA', latency: 1100, speed: 3, cost: 1, weight: 1 },
+        { id: 7, name: "Sia_SP3", location: 'Paris France', latency: 420, speed: 5, cost: 4, weight: 1 },
+        { id: 8, name: "Sia_SP4", location: 'Sydney, Australia', latency: 460, speed: 8, cost: 2, weight: 1 },
+        { id: 9, name: "Filecoin_SP4", location: 'Seattle, USA', latency: 1300, speed: 2, cost: 1, weight: 1 },
+        { id: 10, name: "Sia_SP5", location: 'Mumbai, India', latency: 470, speed: 7, cost: 2, weight: 1 }
+    ];
+    class FilterSlider {
+        constructor(min = 0, max = 0, current = 0) {
+            this.min = min;
+            this.max = max;
+            this.current = current;
+        }
+        min = 0;
+        max = 0;
+        current = 0;
+        percentage = 0;
+        getPercentage() {
+            return this.percentage;
+        }
+        setPercentage(val) {
+
+        }
+        updatePercentage() {
+            this.percentage = Math.round(((this.current - this.min) / (this.max - this.min) * 100));
+        }
+        getMin() {
+            return this.min;
+        }
+        setMin(val) {
+            this.min = val;
+        }
+        getMax() {
+            return this.max;
+        }
+        setMax(val) {
+            this.max = val;
+        }
+        getCurrent() {
+            return this.current;
+        }
+        setCurrent(val) {
+            this.current = val;
+            this.updatePercentage()
+        }
+    }
+
+
+    class Latency extends FilterSlider {
+        setPercentage(val) {
+            this.percentage = val;
+            this.current = (val / 100 * (this.max - this.min) + this.min).toFixed(0);
+        }
+    };
+    class Speed extends FilterSlider {
+        setPercentage(val) {
+            this.percentage = val;
+            this.current = (val / 100 * (this.max - this.min) + this.min).toFixed(2);
+        }
+    };
+    class Cost extends FilterSlider {
+        setPercentage(val) {
+            this.percentage = val;
+            this.current = (val / 100 * (this.max - this.min) + this.min).toFixed(2);
+        }
+    };
+
+    let latency = new Latency(min = 0, max = 0, current = 0, percentage = 0);
+    let speed = new Speed(min = 0, max = 0, current = 0, percentage = 0);
+    let cost = new Cost(min = 0, max = 0, current = 0, percentage = 0);
+
+    displayData()
+    getInitialFilterValues();
+    var $grid = $('.grid').isotope({
+        getSortData: {
+            latency: function (itemElem) {
+                var latency = itemElem.querySelector('.latency').textContent;
+                return parseFloat(latency.replace(/[\(\)]/g, ''));
+            },
+            speed: function (itemElem) {
+                var speed = itemElem.querySelector('.speed').textContent;
+                return parseFloat(speed.replace(/[\(\)]/g, ''));
+            },
+            cost: function (itemElem) {
+                var cost = itemElem.querySelector('.cost').textContent;
+                return parseFloat(cost.replace(/[\(\)]/g, ''));
+            },
+            weight: function (itemElem) { // function
+                var weight = $(itemElem).find('.weight').text();
+                return parseFloat(weight.replace(/[\(\)]/g, ''));
+            }
+        }
+    });
+
+
+    function calculateScore() {
+        data = data.map((item, index) => {
+            const latencyQ = ((item.latency - latency.getMin()) / (latency.getMax() - latency.getMin()));
+            const costQ = ((item.cost - cost.getMin()) / (cost.getMax() - cost.getMin()));
+            const speedQ = ((item.speed - speed.getMin()) / (speed.getMax() - speed.getMin()));
+            const weight = parseFloat(latencyQ * latency.getPercentage()) + parseFloat(speedQ + speed.getPercentage()) + parseFloat(costQ * cost.getPercentage());
+            item.weight = weight;
+            $('#weight-' + item.id).text(item.weight);
+            return item;
+        });
+        $("button[data-sort-value='weight']").trigger("click");
+    }
+    function setFilter() {
+
+        $('#range-latency-control').attr('value', (latency.getPercentage() / 100).toFixed(2));
+        $('#range-latency-control').val(latency.getPercentage().toFixed(2) / 100);
+        $('#range-latency').html('(' + latency.getPercentage().toFixed(2) + '%)');
+
+        $('#range-speed-control').attr('value', (speed.getPercentage() / 100).toFixed(2));
+        $('#range-speed-control').val(speed.getPercentage().toFixed(2) / 100);
+        $('#range-speed').html('(' + speed.getPercentage().toFixed(2) + '%)');
+
+        $('#range-cost-control').attr('value', (cost.getPercentage() / 100).toFixed(2));
+        $('#range-cost-control').val(cost.getPercentage().toFixed(2) / 100);
+        $('#range-cost').html('(' + cost.getPercentage().toFixed(2) + '%)');
+
+        calculateScore();
+    }
+
+    // bind sort button click
+
+
+    function getInitialFilterValues() {
+        //latency
+        latency.setMin(data.map(item => item.latency).sort((a, b) => a - b)[0]);
+        latency.setMax(data.map(item => item.latency).sort((a, b) => a - b)[data.length - 1]);
+        latency.setCurrent(latency.max);
+        latency.updatePercentage();
+
+
+
+        //speed
+        speed.setMin(data.map(item => item.speed).sort((a, b) => a - b)[0]);
+        speed.setMax(data.map(item => item.speed).sort((a, b) => a - b)[data.length - 1]);
+        speed.setCurrent(speed.min);
+        speed.updatePercentage();
+
+
+
+        //cost
+        cost.setMin(data.map(item => item.cost).sort((a, b) => a - b)[0]);
+        cost.setMax(data.map(item => item.cost).sort((a, b) => a - b)[data.length - 1]);
+        cost.setCurrent(cost.min);
+        cost.updatePercentage();
+
+
+
+        setFilter();
+    }
+    function displayData() {
+        let generatedData = data.map((item, index) => {
+            return `<div class="element-item d-flex flex-column">
+                    <span class="text-right ">${item.location}</span>
+                    <h3 class="name text-center mt-4 mb-5">${item.name}</h3>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="text-center">Latency</div>
+                        <div class="text-center latency">${item.latency} mbps</div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="text-center">Speed</div>
+                        <div class="text-center speed">${item.speed} MB/S</div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="text-center">Cost</div>
+                        <div class="text-center cost">${item.cost} USD/GB</div>
+                    </div>
+                    <div class="text-center weight invisible" id=${'weight-' + item.id}>${item.weight}</div>
+                </div>`;
+        });
+
+        $('.grid').html(generatedData);
+    }
+
+    // bind sort button click
+    var sortByGroup = document.querySelector('.sort-by-button-group');
+    sortByGroup.addEventListener('click', function (event) {
+        // only button clicks
+
+        if (!matchesSelector(event.target, '.button')) {
+            return;
+        }
+        var sortValue = event.target.getAttribute('data-sort-value');
+
+        $grid.isotope({ sortBy: sortValue})
+        // $grid.arrange({ sortBy: sortValue });
+    });
+
+    
+    var threeSlide = document.querySelector('#slide-hidden-control');
+    threeSlide.addEventListener('click', function (event) {
+        // only button clicks
+        var sortValue = event.target.getAttribute('data-sort-value');
+
+        $grid.isotope({ sortBy: sortValue})
+        // $grid.arrange({ sortBy: sortValue });
+    });
+    
+    var latencyControl = document.querySelector('#range-latency-control');
+    latencyControl.addEventListener('change', function(event) {
+        $('.grid').isotope( {sortData: 'weight'} );
+        $('.grid').isotope( 'updateSortData', $('.grid').children() );
+    })
+    var speedControl = document.querySelector('#range-speed-control');
+    speedControl.addEventListener('change', function(event) {
+        $('.grid').isotope( {sortData: 'weight'} );
+        $('.grid').isotope( 'updateSortData', $('.grid').children() );
+    })
+    var costControl = document.querySelector('#range-cost-control');
+    costControl.addEventListener('change', function(event) {
+        $('.grid').isotope( {sortData: 'weight'} );
+        $('.grid').isotope( 'updateSortData', $('.grid').children() );
+    })
+
+
+    // change is-checked class on buttons
+    var buttonGroups = document.querySelectorAll('.button-group');
+    for (var i = 0; i < buttonGroups.length; i++) {
+        buttonGroups[i].addEventListener('click', onButtonGroupClick);
+    }
+
+    function onButtonGroupClick(event) {
+        // only button clicks
+        if (!matchesSelector(event.target, '.button')) {
+            return;
+        }
+        var button = event.target;
+        button.parentNode.querySelector('.is-checked').classList.remove('is-checked');
+        button.classList.add('is-checked');
+    }
+
+    function rangeLatencySlide(value) {
+        latency.setPercentage(parseFloat(value) * 100);
+        latency.updatePercentage();
+
+
+        const resPercentage = 100 - latency.getPercentage();
+        let rate1 = 0;
+        let rate2 = 0;
+        if (speed.getPercentage() <= 0 || cost.getPercentage() <= 0) {
+            rate1 = 0.5;
+            rate2 = 0.5;
+        } else {
+            rate1 = speed.getPercentage() / (cost.getPercentage() + speed.getPercentage());
+            rate2 = cost.getPercentage() / (cost.getPercentage() + speed.getPercentage());
+        }
+
+        if (speed.getPercentage() + cost.getPercentage() > resPercentage) {
+            const span = speed.getPercentage() + cost.getPercentage() - resPercentage;
+
+            speed.setPercentage(speed.getPercentage() - span * rate1);
+            cost.setPercentage(cost.getPercentage() - span * rate2);
+        } else {
+            const span = resPercentage - (speed.getPercentage() + cost.getPercentage());
+            speed.setPercentage(speed.getPercentage() + span * rate1);
+            cost.setPercentage(cost.getPercentage() + span * rate2);
+        }
+        setFilter();
+
+    }
+
+
+
+    function rangeSpeedSlide(value) {
+        speed.setPercentage(parseFloat(value) * 100);
+        speed.updatePercentage();
+
+
+        const resPercentage = 100 - speed.getPercentage();
+        let rate1 = 0;
+        let rate2 = 0;
+        if (latency.getPercentage() <= 0 || cost.getPercentage() <= 0) {
+            rate1 = 0.5;
+            rate2 = 0.5;
+        } else {
+            rate1 = latency.getPercentage() / (cost.getPercentage() + latency.getPercentage());
+            rate2 = cost.getPercentage() / (cost.getPercentage() + latency.getPercentage());
+        }
+
+        if (latency.getPercentage() + cost.getPercentage() > resPercentage) {
+            const span = latency.getPercentage() + cost.getPercentage() - resPercentage;
+            latency.setPercentage(latency.getPercentage() - span * rate1);
+            cost.setPercentage(cost.getPercentage() - span * rate2);
+        } else {
+            const span = resPercentage - (latency.getPercentage() + cost.getPercentage());
+            latency.setPercentage(latency.getPercentage() + span * rate1);
+            cost.setPercentage(cost.getPercentage() + span * rate2);
+        }
+
+
+
+        setFilter();
+
+
+    }
+
+    function rangeCostSlide(value) {
+        cost.setPercentage(parseFloat(value) * 100);
+        cost.updatePercentage();
+
+        const resPercentage = 100 - cost.getPercentage();
+        let rate1 = 0;
+        let rate2 = 0;
+        if (speed.getPercentage() <= 0 || latency.getPercentage() <= 0) {
+            rate1 = 0.5;
+            rate2 = 0.5;
+        } else {
+            rate1 = speed.getPercentage() / (latency.getPercentage() + speed.getPercentage());
+            rate2 = latency.getPercentage() / (latency.getPercentage() + speed.getPercentage());
+        }
+
+        if (latency.getPercentage() + speed.getPercentage() > resPercentage) {
+            const span = latency.getPercentage() + speed.getPercentage() - resPercentage;
+            latency.setPercentage(latency.getPercentage() - span * rate2);
+            speed.setPercentage(speed.getPercentage() - span * rate1);
+        } else {
+            const span = resPercentage - (latency.getPercentage() + speed.getPercentage());
+            latency.setPercentage(latency.getPercentage() + span * rate2);
+            speed.setPercentage(speed.getPercentage() + span * rate1);
+        }
+
+        setFilter();
+
+    }
+
+</script>
+
+</html>
