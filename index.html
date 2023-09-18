@@ -253,8 +253,11 @@
     let speed = new Speed(min = 0, max = 0, current = 0, percentage = 0);
     let cost = new Cost(min = 0, max = 0, current = 0, percentage = 0);
 
-    displayData()
+    displayData();
     getInitialFilterValues();
+    $(document).ready(function() {
+        $grid.isotope({ sortBy: 'latency'})
+    })
     var $grid = $('.grid').isotope({
         getSortData: {
             latency: function (itemElem) {
@@ -273,7 +276,8 @@
                 var weight = $(itemElem).find('.weight').text();
                 return parseFloat(weight.replace(/[\(\)]/g, ''));
             }
-        }
+        },
+        sortAscending: false
     });
 
 
@@ -282,8 +286,20 @@
             const latencyQ = ((item.latency - latency.getMin()) / (latency.getMax() - latency.getMin()));
             const costQ = ((item.cost - cost.getMin()) / (cost.getMax() - cost.getMin()));
             const speedQ = ((item.speed - speed.getMin()) / (speed.getMax() - speed.getMin()));
-            const weight = parseFloat(latencyQ * latency.getPercentage()) + parseFloat(speedQ + speed.getPercentage()) + parseFloat(costQ * cost.getPercentage());
+            const weight = parseFloat(latencyQ * latency.getPercentage()) + parseFloat(speedQ * speed.getPercentage()) + parseFloat(costQ * cost.getPercentage());
             item.weight = weight;
+            // console.log(item.name);
+            // console.log('latencyQ', latencyQ);
+            // console.log('latencuPercentage', latency.getPercentage());
+            // console.log('speedQ', speedQ);
+            // console.log('speedPercentage', speed.getPercentage());
+            // console.log('costQ', costQ);
+            // console.log('costPercentage', speed.getPercentage());
+            // console.log('latency', parseFloat(latencyQ * latency.getPercentage()));
+            // console.log('speed',parseFloat(speedQ * speed.getPercentage()));
+            // console.log('cost', parseFloat(costQ * cost.getPercentage()));
+            // console.log('weight', weight);
+            // console.log('--------------------------');
             $('#weight-' + item.id).text(item.weight);
             return item;
         });
@@ -425,6 +441,11 @@
         const resPercentage = 100 - latency.getPercentage();
         let rate1 = 0;
         let rate2 = 0;
+        if(speed.getPercentage() == 0 && cost.getPercentage() > 0) {
+            rate1 = 0.5;
+            rate2 = 0.5;
+        }
+
         if (speed.getPercentage() <= 0 || cost.getPercentage() <= 0) {
             rate1 = 0.5;
             rate2 = 0.5;
@@ -435,7 +456,14 @@
 
         if (speed.getPercentage() + cost.getPercentage() > resPercentage) {
             const span = speed.getPercentage() + cost.getPercentage() - resPercentage;
-
+            if(cost.getPercentage() == 0 && speed.getPercentage() > 0) {
+                rate1 = 1;
+                rate2 = 0;
+            }
+            if(speed.getPercentage() == 0 && cost.getPercentage() > 0) {
+                rate1 = 0;
+                rate2 = 1;
+            }
             speed.setPercentage(speed.getPercentage() - span * rate1);
             cost.setPercentage(cost.getPercentage() - span * rate2);
         } else {
@@ -467,6 +495,14 @@
 
         if (latency.getPercentage() + cost.getPercentage() > resPercentage) {
             const span = latency.getPercentage() + cost.getPercentage() - resPercentage;
+            if(cost.getPercentage() == 0 && latency.getPercentage() > 0) {
+                rate1 = 1;
+                rate2 = 0;
+            }
+            if(latency.getPercentage() == 0 && cost.getPercentage() > 0) {
+                rate1 = 0;
+                rate2 = 1;
+            }
             latency.setPercentage(latency.getPercentage() - span * rate1);
             cost.setPercentage(cost.getPercentage() - span * rate2);
         } else {
@@ -474,12 +510,7 @@
             latency.setPercentage(latency.getPercentage() + span * rate1);
             cost.setPercentage(cost.getPercentage() + span * rate2);
         }
-
-
-
         setFilter();
-
-
     }
 
     function rangeCostSlide(value) {
@@ -499,6 +530,14 @@
 
         if (latency.getPercentage() + speed.getPercentage() > resPercentage) {
             const span = latency.getPercentage() + speed.getPercentage() - resPercentage;
+            if(speed.getPercentage() == 0 && latency.getPercentage() > 0) {
+                rate1 = 0;
+                rate2 = 1;
+            }
+            if(latency.getPercentage() == 0 && speed.getPercentage() > 0) {
+                rate1 = 1;
+                rate2 = 0;
+            }
             latency.setPercentage(latency.getPercentage() - span * rate2);
             speed.setPercentage(speed.getPercentage() - span * rate1);
         } else {
